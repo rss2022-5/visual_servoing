@@ -31,7 +31,7 @@ def cd_sift_ransac(img, template):
 	"""
 	Implement the cone detection using SIFT + RANSAC algorithm
 	Input:
-		img: np.3darray; the input image with a cone to be detected
+g		img: np.3darray; the input image with a cone to be detected
 	Return:
 		bbox: ((x1, y1), (x2, y2)); the bounding box of the cone, unit in px
 				(x1, y1) is the bottom left of the bbox and (x2, y2) is the top right of the bbox
