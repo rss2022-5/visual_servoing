@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 import pdb
@@ -34,9 +35,26 @@ def cd_color_segmentation(img, template):
 				(x1, y1) is the top left of the bbox and (x2, y2) is the bottom right of the bbox
 	"""
 	########## YOUR CODE STARTS HERE ##########
+	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	lower_orange = (0,140,190)
+	upper_orange = (30,255,255)
+	mask = cv2.inRange(hsv, lower_orange, upper_orange)
+	mask_and = cv2.bitwise_and(hsv, hsv, mask = mask)
+	kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))	
 
-	bounding_box = ((0,0),(0,0))
-
+	# Erode then dilate
+	result_erode = cv2.erode(mask_and, kernel)
+	result_dilate = cv2.dilate(result_erode, kernel)
+	inter_result = cv2.cvtColor(result_dilate, cv2.COLOR_HSV2BGR)
+	result = cv2.cvtColor(inter_result, cv2.COLOR_BGR2GRAY)
+	img2, contours, hierarchy = cv2.findContours(result, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	if len(contours) != 0:
+    		# find the biggest countour (c) by the area
+    		c = max(contours, key = cv2.contourArea)
+    		x,y,w,h = cv2.boundingRect(c)
+	else:
+		x =y=w=h  = 0
+	bounding_box = ((x,y),(x+w,y+h))
 	########### YOUR CODE ENDS HERE ###########
 
 	# Return bounding box
