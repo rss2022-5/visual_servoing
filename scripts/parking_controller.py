@@ -22,7 +22,7 @@ class ParkingController():
         self.error_pub = rospy.Publisher("/parking_error",
             ParkingError, queue_size=10)
 
-        self.parking_distance = .75 # meters; try playing with this number!
+        self.parking_distance = 2 # meters; try playing with this number!
         self.relative_x = 0
         self.relative_y = 0
 
@@ -32,7 +32,6 @@ class ParkingController():
         drive_cmd = AckermannDriveStamped()
 
         #################################
-
         # YOUR CODE HERE
         # Use relative position and your control law to set drive_cmd
         
@@ -43,7 +42,7 @@ class ParkingController():
         #find nu = angle between car and cone, aTan(y/x)
         nu = np.arctan(self.relative_x/self.relative_y)
         #drive angle = the thing we are setting
-        if l > self.parking_distance:
+        if l <= self.parking_distance:
             drive_cmd.drive.speed = 0.0
         else:
             drive_cmd.drive.speed = 1.0
