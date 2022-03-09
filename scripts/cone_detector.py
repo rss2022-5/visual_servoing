@@ -49,7 +49,15 @@ class ConeDetector():
         # Make a mask
         # Run module 1 cone detection on masked image
         # Return center of the bounding box
-        bbox = cd_color_segmentation(image, None)
+        if (not self.LineFollower):
+            bbox = cd_color_segmentation(image, None)
+        if (self.LineFollower)
+            mask = np.zeros((image.shape[0],image.shape[1],3),dtype=np.uint8)
+            mask[90:120,:,:] = 1
+            new_image = image*mask
+            bbox = cd_color_segmentation(new_image, None)
+
+            #Crop the camera's image and return a small section about an eighth of the way up 
         # Another node will use homography transformation to turn this into a point in space
         cv2.rectangle(image, bbox[0], bbox[1], (255,255,255), 3)
         
