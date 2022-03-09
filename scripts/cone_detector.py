@@ -52,10 +52,15 @@ class ConeDetector():
         bbox = cd_color_segmentation(image, None)
         # Another node will use homography transformation to turn this into a point in space
         cv2.rectangle(image, bbox[0], bbox[1], (255,255,255), 3)
+        image = cv2.circle(image, ((bbox[0][0] + bbox[1][0]) / 2, bbox[1][1]), 1, (255,0,0), 3)
         
+        # print(len(image))
+        # print(len(image[0]))
+        # quit()
+
         cone_location = ConeLocationPixel()
         cone_location.u = (bbox[0][0] + bbox[1][0]) / 2
-        cone_location.v = (bbox[0][0] + bbox[1][0]) / 2
+        cone_location.v = (bbox[1][1])
 
         self.cone_pub.publish(cone_location)
         debug_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")

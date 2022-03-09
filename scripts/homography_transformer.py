@@ -20,11 +20,27 @@ from visual_servoing.msg import ConeLocation, ConeLocationPixel
 
 ######################################################
 ## DUMMY POINTS -- ENTER YOUR MEASUREMENTS HERE
-PTS_IMAGE_PLANE = [[298, 337],
+PTS_IMAGE_PLANE = [
+                   [298, 337],
                    [300, 318],
                    [301, 301],
                    [302, 289],
-                   [303, 278]] # dummy points
+                   [303, 278],
+                
+                # close points
+                   [315,309],
+                   [384,309],
+                   [367,276],
+                   [313,279],
+
+                   # hallway points
+                   [159,265],
+                   [428,196],
+                   [316, 230],
+                   [367,191],
+                   [648,268],
+                   [101,231],
+                   [281,184]] # dummy points
 ######################################################
 
 # PTS_GROUND_PLANE units are in inches
@@ -32,11 +48,27 @@ PTS_IMAGE_PLANE = [[298, 337],
 
 ######################################################
 ## DUMMY POINTS -- ENTER YOUR MEASUREMENTS HERE
-PTS_GROUND_PLANE = [[15.5, 0],
+PTS_GROUND_PLANE = [
+                    [15.5, 0],
                     [16.45, 0],
                     [17.4, 0],
                     [18.35, 0],
-                    [19.30, 0]] # dummy points
+                    [19.30, 0],
+
+                    # close points
+                    [16.75,0],
+                    [16.75,-3.8],
+                    [22.45,-3.8],
+                    [21.5,0],
+                    
+                    #hallway points
+                    [24, 12],
+                    [72, -24],
+                    [36, 0],
+                    [84, -12],
+                    [24, -24],
+                    [36, 24],
+                    [9*12, 12]] # last one
 ######################################################
 
 METERS_PER_INCH = 0.0254
@@ -75,8 +107,11 @@ class HomographyTransformer:
 
         #Publish relative xy position of object in real world
         relative_xy_msg = ConeLocation()
+        x += 0.25
+        # y -= 0.064
         relative_xy_msg.x_pos = x
         relative_xy_msg.y_pos = y
+        self.draw_marker(x,y,"/base_link")
 
         self.cone_pub.publish(relative_xy_msg)
 
