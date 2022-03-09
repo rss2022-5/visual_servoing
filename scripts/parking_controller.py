@@ -46,7 +46,7 @@ class ParkingController():
         #set car length
         L = .325
         #find nu = angle between car and cone, aTan(y/x)
-        nu = np.arctan2(self.relative_y,self.relative_x)
+        nu = np.arctan2(self.relative_y, self.relative_x)
         #drive angle = the thing we are setting
         if l <= self.parking_distance:
             drive_cmd.drive.speed = 0.0
