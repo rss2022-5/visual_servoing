@@ -22,9 +22,15 @@ class ParkingController():
         self.error_pub = rospy.Publisher("/parking_error",
             ParkingError, queue_size=10)
 
-        self.parking_distance = 2 # meters; try playing with this number!
+        self.parking_distance = .75 # meters; try playing with this number!
         self.relative_x = 0
         self.relative_y = 0
+
+        self.s = "/home/racecar_ws/"
+
+        with open(self.s, "w") as self.error_log:
+            self.error_log.write("")
+        self.error_log = open(self.s, "a")
 
     def relative_cone_callback(self, msg):
         self.relative_x = msg.x_pos
@@ -38,15 +44,21 @@ class ParkingController():
         #find L1 = distance between car and cone (basic distance equation)
         l = np.sqrt(self.relative_x**2 + self.relative_y**2)
         #set car length
-        L = .3
+        L = .325
         #find nu = angle between car and cone, aTan(y/x)
-        nu = np.arctan(self.relative_x/self.relative_y)
+        nu = np.arctan2(self.relative_y,self.relative_x)
         #drive angle = the thing we are setting
         if l <= self.parking_distance:
             drive_cmd.drive.speed = 0.0
         else:
             drive_cmd.drive.speed = 1.0
-            drive_cmd.drive.steering_angle = np.arctan(2*L*np.sin(nu)/l)
+            drive_cmd.drive.steering_angle = np.arctan(2*L*np.sin(nu)/l)*l
+        
+        # write the error to a file
+        self.error_log.write(str(rospy.get_rostime().to_sec())+",")
+        self.error_log.write(str(self.relative_x)+",")
+        self.error_log.write(str(self.relative_y)+",")
+        self.error_log.write(str(np.sqrt(self.relative_x**2 + self.relative_y**2))+"\n")
 
         #################################
 
