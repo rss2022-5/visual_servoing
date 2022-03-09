@@ -51,9 +51,9 @@ class ConeDetector():
         # Return center of the bounding box
         if (not self.LineFollower):
             bbox = cd_color_segmentation(image, None)
-        if (self.LineFollower)
+        else:
             mask = np.zeros((image.shape[0],image.shape[1],3),dtype=np.uint8)
-            mask[90:120,:,:] = 1
+            mask[230:260,:,:] = 1
             new_image = image*mask
             bbox = cd_color_segmentation(new_image, None)
 

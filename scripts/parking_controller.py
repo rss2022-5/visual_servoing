@@ -22,15 +22,13 @@ class ParkingController():
         self.error_pub = rospy.Publisher("/parking_error",
             ParkingError, queue_size=10)
 
-<<<<<<< HEAD
-        self.parking_distance = 1 # meters; try playing with this number!
-=======
-        self.parking_distance = .75 # meters; try playing with this number!
->>>>>>> 10a1e8b708b9d30f3eda1a65d292d5b1ba554480
+        self.parking_distance = 0.25 # meters; try playing with this number!
+        # self.parking_distance = 0.5 # meters; try playing with this number!
         self.relative_x = 0
         self.relative_y = 0
+        self.speed = 0.5
 
-        self.s = "/home/racecar_ws/"
+        self.s = "/home/racecar/error_log_parking" + str(self.speed) + ".csv"
 
         with open(self.s, "w") as self.error_log:
             self.error_log.write("")
@@ -52,10 +50,13 @@ class ParkingController():
         #find nu = angle between car and cone, aTan(y/x)
         nu = np.arctan2(self.relative_y, self.relative_x)
         #drive angle = the thing we are setting
-        if l <= self.parking_distance:
+        
+        if l <= self.parking_distance + 0.2 + self.speed*0.3:
+            rospy.logwarn("too close")
             drive_cmd.drive.speed = 0.0
         else:
-            drive_cmd.drive.speed = 1.0
+            rospy.logwarn(l)
+            drive_cmd.drive.speed = self.speed
             drive_cmd.drive.steering_angle = np.arctan(2*L*np.sin(nu)/l)*l
         
         # write the error to a file
