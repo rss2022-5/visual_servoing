@@ -36,9 +36,16 @@ def cd_color_segmentation(img, template):
 	"""
 	########## YOUR CODE STARTS HERE ##########
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	lower_orange = (0,140,190)
-	upper_orange = (30,255,255)
-	mask = cv2.inRange(hsv, lower_orange, upper_orange)
+	lh = rospy.get_param("~lowh", default=0)
+        ls = rospy.get_param("~lows", default=140)
+        lv = rospy.get_param("~lowv", default=190)
+        lower = (lh, ls, lv)
+
+        uh = rospy.get_param("~upperh", default=30)
+        us = rospy.get_param("~uppers", default=255)
+        uv = rospy.get_param("~upperv", default=255)
+        upper = (uh, us, uv)
+	mask = cv2.inRange(hsv, lower, upper)
 	mask_and = cv2.bitwise_and(hsv, hsv, mask = mask)
 	kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))	
 
