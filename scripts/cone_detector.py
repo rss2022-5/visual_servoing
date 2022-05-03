@@ -9,6 +9,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Point #geometry_msgs not in CMake file
 from visual_servoing.msg import ConeLocationPixel
+from std_msgs.msg import Float32
 
 # import your color segmentation algorithm; call this function in ros_image_callback!
 from computer_vision.color_segmentation import cd_color_segmentation
@@ -22,12 +23,13 @@ class ConeDetector():
     """
     def __init__(self):
         # toggle line follower vs cone parker
-        self.LineFollower = False
+        self.LineFollower = True
 
         # Subscribe to ZED camera RGB frames
         self.cone_pub = rospy.Publisher("/relative_cone_px", ConeLocationPixel, queue_size=10)
         self.debug_pub = rospy.Publisher("/cone_debug_img", Image, queue_size=10)
         self.image_sub = rospy.Subscriber("/zed/zed_node/rgb/image_rect_color", Image, self.image_callback)
+        self.direction_pub = rospy.Publisher("/direct_pub", Float32, queue_size = 10)
         self.bridge = CvBridge() # Converts between ROS images and OpenCV Images
 
     def image_callback(self, image_msg):
@@ -53,7 +55,7 @@ class ConeDetector():
             bbox = cd_color_segmentation(image, None)
         else:
             mask = np.zeros((image.shape[0],image.shape[1],3),dtype=np.uint8)
-            mask[230:260,:,:] = 1
+            mask[220:250,:,:] = 1 #previous 240 - 260, pixels at top are 0, 220 - 250
             new_image = image*mask
             bbox = cd_color_segmentation(new_image, None)
 
@@ -62,13 +64,21 @@ class ConeDetector():
         cv2.rectangle(image, bbox[0], bbox[1], (255,255,255), 3)
         image = cv2.circle(image, ((bbox[0][0] + bbox[1][0]) / 2, bbox[1][1]), 1, (255,0,0), 3)
         
-        # print(len(image))
         # print(len(image[0]))
         # quit()
 
         cone_location = ConeLocationPixel()
         cone_location.u = (bbox[0][0] + bbox[1][0]) / 2
         cone_location.v = (bbox[1][1])
+
+        #check which side the line is on
+        #0 for left, 1.0 for right
+        line_side = Float32()
+        if cone_location.u < 320: #right
+            line_side = -1.0
+        else:
+            line_side = 1.0 #left
+        self.direction_pub.publish(line_side)
 
         self.cone_pub.publish(cone_location)
         debug_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")

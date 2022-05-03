@@ -36,8 +36,13 @@ def cd_color_segmentation(img, template):
 	"""
 	########## YOUR CODE STARTS HERE ##########
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	lower_orange = (0,140,190)
-	upper_orange = (30,255,255)
+	lower_orange = (0, 140, 190)
+	upper_orange = (25,255,255)
+	#ones that didn't work
+	#41 240 247 (hit the red)
+	#these were ok...
+	# lower_orange = (5,160,50)
+	#upper_orange = (15,255,255)
 	mask = cv2.inRange(hsv, lower_orange, upper_orange)
 	mask_and = cv2.bitwise_and(hsv, hsv, mask = mask)
 	kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))	
