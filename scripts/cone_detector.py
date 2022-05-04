@@ -79,7 +79,7 @@ class ConeDetector():
         else:
             line_side = 1.0 #left
         self.direction_pub.publish(line_side)
-
+        print(line_side)
         self.cone_pub.publish(cone_location)
         debug_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
         self.debug_pub.publish(debug_msg)

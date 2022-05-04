@@ -32,15 +32,18 @@ class ParkingController():
         # self.parking_distance = 0.5 # meters; try playing with this number!
         self.relative_x = 0
         self.relative_y = 0
-        self.speed = 0.5
+        self.speed = 0.7
         self.previous_turn = 0.0 #keeps track of the previous turn of the robot
         self.line_side = 0.0
 
-        self.s = "/home/racecar/error_log_parking" + str(self.speed) + ".csv"
+        self.s = "/home/racecar/error_log_parking" + str(self.speed) + "round2_funky.csv"
 
         with open(self.s, "w") as self.error_log:
             self.error_log.write("")
         self.error_log = open(self.s, "a")
+
+        self.still_lost = False
+        self.stuck_counter = 0
     
     def direct_cb(self,msg):
         self.line_side = msg.data
@@ -64,16 +67,25 @@ class ParkingController():
         if l <= self.parking_distance + 0.2 + self.speed*0.3: #l <= self.parking_distance + 0.2 + self.speed*0.3
             rospy.logwarn("too close")
             drive_cmd.drive.speed = -0.3 #higher speed = go back farther, -0.5 = FUNCTIONAL
-            if self.previous_turn <= 0.2 and self.previous_turn >= -0.2:
+            
+            if self.still_lost == True: #self.previous_turn <= 0.2 and self.previous_turn >= -0.2:
+                #self.still_lost = True
                 #print(self.line_side)
-                drive_cmd.drive.steering_angle = 1.0 *self.line_side
+                drive_cmd.drive.steering_angle = -1.0 *self.line_side #this gets it over the first turn
+                self.stuck_counter = 0
+                self.still_lost = False
             else:
+                #print("doing this")
+                self.stuck_counter = self.stuck_counter + 1
                 drive_cmd.drive.steering_angle = self.previous_turn
+                if self.stuck_counter > 5:
+                    self.still_lost = True
             
             #np.arctan(2*L*np.sin(nu)/l)*l
             #old equation
             #np.arctan(2*L*np.sin(nu)/l)*l
         else:
+            self.stuck_counter = 0
             rospy.logwarn(l)
             drive_cmd.drive.speed = self.speed
             drive_cmd.drive.steering_angle = np.arctan(2*L*np.sin(nu)/l)*l
